@@ -14,6 +14,11 @@ This is of course not an original idea, but my preferred and fairly simple imple
 The code is fully tested, I however do not take responsibility for use in production. 
 
 Use at your own risk.
+
+## Installation:
+
+``composer require maxkaemmerer/commands``
+
 ## Usage:
 Generally you don't want to register each ``CommandHandler`` by hand. You might want to use dependency injection via a container or service-manager.
 
