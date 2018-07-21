@@ -34,7 +34,7 @@ Register a ``CommandHandler`` to the ``CommandBus``. The ``CommandHandler``'s ``
 
 Best practice would be using the fully qualified class name of the command. ``MyCommand::class``
 
-The ``handle($command)`` method is where your actual domain logic happens.
+The ``CommandHandler::handle($command)`` method is where your actual domain logic happens.
 
 Feel free to inject services, a container, or whatever else you need, into your ``CommandHandler``s.
 
@@ -64,7 +64,7 @@ Feel free to inject services, a container, or whatever else you need, into your 
     });
 
 #### Dispatch a Command:
-Dispatching a ``Command`` causes the ``CommandBus`` to look for a ``CommandHandler`` who's ``CommandHandler:handles()`` method matches the ``Command``'s name, specified by ``Command:name()``.
+Dispatching a ``Command`` causes the ``CommandBus`` to look for a ``CommandHandler`` who's ``CommandHandler:handles()`` method matches the ``Command``'s name, specified by ``Command:name()``, and calls it's ``CommandHandler::handle($command)`` method.
 
 IMPORTANT: ``CommandHandler``'s and the ``CommandBus`` never return anything.
 
