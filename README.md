@@ -162,4 +162,5 @@ IMPORTANT: ``CommandHandler``'s and the ``CommandBus`` never return anything.
     }
     
 Result:
-``Hello World!``
+
+    Hello World!
