@@ -11,7 +11,7 @@ interface CommandHandler
     /**
      * @param Command $command
      */
-    public function handle(Command $command): void;
+    public function __invoke(Command $command): void;
 
     /**
      * @return string

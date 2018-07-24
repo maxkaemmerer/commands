@@ -92,7 +92,7 @@ class CommandBusTest extends TestCase
 
     private function thenTheCommandHandlerShouldBeCalled(): void
     {
-        $this->commandHandler->handle(Argument::type(Command::class))->shouldBeCalled();
+        $this->commandHandler->__invoke(Argument::type(Command::class))->shouldBeCalled();
     }
 
     private function whenACommandIsDispatched(): void
@@ -118,6 +118,6 @@ class CommandBusTest extends TestCase
 
     private function thenTheMostRecentlyRegisteredCommandHandlerShouldBeCalled(): void
     {
-        $this->otherCommandHandler->handle(Argument::type(Command::class))->shouldBeCalled();
+        $this->otherCommandHandler->__invoke(Argument::type(Command::class))->shouldBeCalled();
     }
 }

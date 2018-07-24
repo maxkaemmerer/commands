@@ -33,7 +33,7 @@ final class SimpleCommandBus implements CommandBus
         /** @var CommandHandler $commandHandler */
         $commandHandler = $this->handlers[$command->name()];
 
-        $commandHandler->handle($command);
+        $commandHandler($command);
     }
 
     /**

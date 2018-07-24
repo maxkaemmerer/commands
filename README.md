@@ -34,7 +34,7 @@ Register a ``CommandHandler`` to the ``CommandBus``. The ``CommandHandler``'s ``
 
 Best practice would be using the fully qualified class name of the command. ``MyCommand::class``
 
-The ``CommandHandler::handle($command)`` method is where your actual domain logic happens.
+The ``CommandHandler::__invoke($command)`` method is where your actual domain logic happens.
 
 Feel free to inject services, a container, or whatever else you need, into your ``CommandHandler``s.
 
@@ -47,7 +47,7 @@ Feel free to inject services, a container, or whatever else you need, into your 
         /**
          * @param Command $command
          */
-        public function handle(Command $command): void
+        public function __invoke(Command $command): void
         {
             echo $command->payload()->get('message');
         }
@@ -64,7 +64,7 @@ Feel free to inject services, a container, or whatever else you need, into your 
     });
 
 #### Dispatch a Command:
-Dispatching a ``Command`` causes the ``CommandBus`` to look for a ``CommandHandler`` who's ``CommandHandler:handles()`` method matches the ``Command``'s name, specified by ``Command:name()``, and calls it's ``CommandHandler::handle($command)`` method.
+Dispatching a ``Command`` causes the ``CommandBus`` to look for a ``CommandHandler`` who's ``CommandHandler:handles()`` method matches the ``Command``'s name, specified by ``Command:name()``, and calls it's ``CommandHandler::__invoke($command)`` method.
 
 IMPORTANT: ``CommandHandler``'s and the ``CommandBus`` never return anything.
 
@@ -118,7 +118,7 @@ IMPORTANT: ``CommandHandler``'s and the ``CommandBus`` never return anything.
             /**
              * @param Command $command
              */
-            public function handle(Command $command): void
+            public function __invoke(Command $command): void
             {
                 echo $command->payload()->get('message');
             }
@@ -164,3 +164,93 @@ IMPORTANT: ``CommandHandler``'s and the ``CommandBus`` never return anything.
 Result:
 
     Hello World!
+    
+    
+### Example with full classes
+
+    <?php
+    
+    use MaxKaemmerer\Commands\Command;
+    use MaxKaemmerer\Commands\CommandHandler;
+    use MaxKaemmerer\Commands\CommandPayload;
+    use MaxKaemmerer\Commands\Exception\CommandException;
+    use MaxKaemmerer\Commands\Implementations\Payload;
+    use MaxKaemmerer\Commands\Implementations\SimpleCommandBus;
+    
+    require_once __DIR__ . '/vendor/autoload.php';
+    
+    class SendBookingConfirmation implements Command
+    {
+    
+        /** @var CommandPayload */
+        private $payload;
+    
+        private function __construct()
+        {
+        }
+    
+        public static function to(string $email): Command
+        {
+            $instance = new self();
+            $instance->payload = Payload::fromArray(['email' => $email]);
+            return $instance;
+        }
+    
+        /**
+         * @return CommandPayload
+         */
+        public function payload(): CommandPayload
+        {
+            return $this->payload;
+        }
+    
+        /**
+         * @return string
+         * The name of this command, it is recommended to use the fully qualified class name.
+         */
+        public function name(): string
+        {
+            return self::class;
+        }
+    }
+    
+    
+    class HandleSendBookingConfirmation implements CommandHandler
+    {
+        /**
+         * @param Command $command
+         * @throws \MaxKaemmerer\Commands\Exception\PayloadItemNotFound
+         */
+        public function __invoke(Command $command): void
+        {
+            // Do things that send the booking confirmation
+            // you might want to throw an event herem, maybe using maxkaemmerer/events ;)
+            echo sprintf('Sending booking confirmation to: "%s"', $command->payload()->get('email'));
+        }
+    
+        /**
+         * @return string
+         * The name of the command this handler handles. Command::name()
+         */
+        public function handles(): string
+        {
+            return SendBookingConfirmation::class;
+        }
+    }
+    
+    try{
+        
+        $commandBus = new SimpleCommandBus();
+        $commandBus->registerHandler(new HandleSendBookingConfirmation());
+    
+        $commandBus->dispatch(
+            SendBookingConfirmation::to('abc@example.com')
+        );
+    
+    } catch (CommandException $exception){
+        error_log($exception->getMessage());
+    }
+    
+Result
+
+``Sending booking confirmation to: "abc@example.com"``
